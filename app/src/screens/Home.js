@@ -1,14 +1,42 @@
+/* global chrome */
+
 import React, { useState } from 'react';
 import BookOutlinedIcon from '@material-ui/icons/BookOutlined';
 import styles from './styles/home.module.css';
 import Category from '../components/Category';
 import CaptureModal from '../components/modals/CaptureModal';
+import mocktabs from '../utils/mocktabs';
+import { useEffect } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-function Home() {
+function Home(props) {
+  const { setGlobal } = props;
   const [openCaptureModal, setOpenCaptureModal] = useState(false);
+  const [tabs, setTabs] = useState([]);
 
-  const toggleCaptureModal = () => {
+  const toggleCaptureModal = (tag = 'default') => {
+    chrome.tabs.query(
+      { windowId: chrome.windows.WINDOW_ID_CURRENT },
+      (tabs) => {
+        const arrTabs = [...tabs];
+        setTabs(arrTabs);
+      }
+    );
+
     setOpenCaptureModal(!openCaptureModal);
+
+    if (tag === 'success') {
+      toast.success('Successfully saved');
+    }
+  };
+
+  const onRemoveTab = (id) => {
+    setTabs(
+      tabs.filter((tab) => {
+        if (tab.id !== id) return tab;
+      })
+    );
   };
   return (
     <>
@@ -25,9 +53,16 @@ function Home() {
             </div>
           </div>
         </div>
-        <Category />
+        <Category setGlobal={setGlobal} />
       </div>
-      <CaptureModal open={openCaptureModal} onClose={toggleCaptureModal} />
+      <CaptureModal
+        open={openCaptureModal}
+        onClose={toggleCaptureModal}
+        tabs={tabs}
+        setGlobal={setGlobal}
+        onRemoveTab={onRemoveTab}
+      />
+      <ToastContainer />
     </>
   );
 }
