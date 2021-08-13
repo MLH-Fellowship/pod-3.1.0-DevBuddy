@@ -1,6 +1,6 @@
 /* global chrome */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../style/capturemodal.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'react-feather';
@@ -18,72 +18,88 @@ const theme = createMuiTheme({
   },
 });
 
-const CategorySelect = ({ category, setCategory }) => {
-  return (
-    <ThemeProvider theme={theme}>
-      <FormControl
-        variant='outlined'
-        style={{ margin: '10px', borderColor: '#0000', flex: 1 }}
-      >
-        <InputLabel
-          htmlFor='outlined-age-native-simple'
-          style={{ color: '#000' }}
-        >
-          Select Category
-        </InputLabel>
-        <Select
-          native
-          value={category}
-          onChange={(e) => {
-            setCategory(e.target.value);
-          }}
-          label='Age'
-          inputProps={{
-            name: 'age',
-            id: 'outlined-age-native-simple',
-          }}
-        >
-          <option aria-label='None' value='' />
-          <option value={'Education'}>Education</option>
-          <option value={'Foodies'}>Foodies</option>
-          <option value={'Entertainment'}>Entertainment</option>
-        </Select>
-      </FormControl>
-    </ThemeProvider>
-  );
-};
+const CategorySelect = ({
+  category,
+  setCategory,
+  data,
+  setCategoryIndex,
+  categoryIndex,
+  group,
+  setGroup,
+}) => {
+  const [cIndex, setCIndex] = useState(0);
 
-const GroupSelect = ({ group, setGroup }) => {
   return (
-    <ThemeProvider theme={theme}>
-      <FormControl
-        variant='outlined'
-        style={{ margin: '10px', borderColor: '#0000', flex: 1 }}
-      >
-        <InputLabel
-          htmlFor='outlined-age-native-simple'
-          style={{ color: '#000' }}
+    <>
+      <ThemeProvider theme={theme}>
+        <FormControl
+          variant='outlined'
+          style={{ margin: '10px', borderColor: '#0000', flex: 1 }}
         >
-          Select Category
-        </InputLabel>
-        <Select
-          native
-          value={group}
-          onChange={(e) => {
-            setGroup(e.target.value);
-          }}
-          label='Age'
-          inputProps={{
-            name: 'age',
-            id: 'outlined-age-native-simple',
-          }}
+          <InputLabel
+            htmlFor='outlined-age-native-simple'
+            style={{ color: '#000' }}
+          >
+            Select Category
+          </InputLabel>
+          <Select
+            native
+            value={categoryIndex}
+            onChange={(e) => {
+              let index = parseInt(e.target.value);
+              setCategoryIndex(index);
+              setCIndex(index);
+              setCategory(data[index].name);
+            }}
+            label='Age'
+            inputProps={{
+              name: 'age',
+              id: 'outlined-age-native-simple',
+            }}
+          >
+            <option aria-label='None' value='' />
+            {data.map((category, cIndex) => {
+              return (
+                <option value={parseInt(cIndex)} index={cIndex}>
+                  {category.name}
+                </option>
+              );
+            })}
+          </Select>
+        </FormControl>
+      </ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <FormControl
+          variant='outlined'
+          style={{ margin: '10px', borderColor: '#0000', flex: 1 }}
         >
-          <option aria-label='None' value='' />
-          <option value={'Leetcode'}>Leetcode</option>
-          <option value={'Geeks for Geeks'}>Geeks for Geeks</option>
-        </Select>
-      </FormControl>
-    </ThemeProvider>
+          <InputLabel
+            htmlFor='outlined-age-native-simple'
+            style={{ color: '#000' }}
+          >
+            Select Group
+          </InputLabel>
+          <Select
+            native
+            value={group}
+            onChange={(e) => {
+              setGroup(e.target.value);
+            }}
+            label='Age'
+            inputProps={{
+              name: 'age',
+              id: 'outlined-age-native-simple',
+            }}
+          >
+            <option aria-label='None' value='' />
+            {data[cIndex] &&
+              data[cIndex].groups.map((group) => {
+                return <option value={group.name}>{group.name}</option>;
+              })}
+          </Select>
+        </FormControl>
+      </ThemeProvider>
+    </>
   );
 };
 
@@ -118,11 +134,20 @@ const Tab = ({ tab, onRemoveTab }) => {
 const CaptureModal = ({ open, onClose, tabs, onRemoveTab, setGlobal }) => {
   const [category, setCategory] = useState('');
   const [group, setGroup] = useState('');
+  const [data, setData] = useState([]);
+  const [categoryIndex, setCategoryIndex] = useState(null);
+
+  useEffect(() => {
+    chrome.storage.local.get(['key'], function (result) {
+      const res = result.key;
+      if (res) {
+        setData(res);
+      }
+    });
+  }, []);
 
   const captureModal = () => {
     chrome.storage.local.get(['key'], function (result) {
-      console.log('Value currently is ' + result.key);
-      //console.log(result.key.length);
       let data = result.key;
       if (data === undefined) {
         data = [
@@ -146,8 +171,6 @@ const CaptureModal = ({ open, onClose, tabs, onRemoveTab, setGlobal }) => {
             for (let j = 0; j < data[i].groups.length; j++) {
               if (data[i].groups[j].name === group) {
                 group_found = true;
-                console.log('group found');
-                //data[i].groups[j].tabs = [...data[i].groups[j].tabs, tabs];
                 for (let k = 0; k < tabs.length; k++) {
                   data[i].groups[j].tabs.push(tabs[k]);
                 }
@@ -176,18 +199,15 @@ const CaptureModal = ({ open, onClose, tabs, onRemoveTab, setGlobal }) => {
         }
       }
 
-      // chrome.storage.local.set({ key: data }, function () {
-      //   console.log('Value is set to ' + data);
-      // });
       setGlobal(data);
-      console.log(data);
       onClose('success');
+      window.location.reload();
     });
   };
   return (
     <motion.div>
-      {open && (
-        <AnimatePresence>
+      <AnimatePresence>
+        {open && (
           <motion.div
             className={styles.modalContainer}
             initial={{ opacity: 0 }}
@@ -218,8 +238,14 @@ const CaptureModal = ({ open, onClose, tabs, onRemoveTab, setGlobal }) => {
                 </ul>
               </div>
               <div className={styles.options}>
-                <CategorySelect category={category} setCategory={setCategory} />
-                <GroupSelect group={group} setGroup={setGroup} />
+                <CategorySelect
+                  category={category}
+                  setCategory={setCategory}
+                  data={data}
+                  setCategoryIndex={setCategoryIndex}
+                  group={group}
+                  setGroup={setGroup}
+                />
               </div>
               <motion.button
                 initial={{ scale: 1 }}
@@ -231,8 +257,8 @@ const CaptureModal = ({ open, onClose, tabs, onRemoveTab, setGlobal }) => {
               </motion.button>
             </motion.div>
           </motion.div>
-        </AnimatePresence>
-      )}
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
