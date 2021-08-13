@@ -2,18 +2,13 @@
 
 
 ## Description
-This is a Chrome Extension developer tools for capturing the current window tabs and for saving them in categories based on their purpose of opening.
-
-![Tabify](./app/src/utils/images/tabify.png)
+A one-stop bookmark management tool for the users. It is a chrome extension that capture all your tabs in the current window under a defined category and group to restore tabs as and when required.
 
 ## Demo
 
 
 https://user-images.githubusercontent.com/45001916/129273905-8904fe43-aa74-4edf-9809-12577fd9103f.mp4
 
-
-## Installation
-Navigate to chrome extension page `extension link` or search for Tabify in chrome web store. Install then you are good to go.
 
 ### Getting Started
 To run locally on your system
@@ -44,18 +39,16 @@ Locate DevBuddy from the list of available extensions and click on it to open up
 @netman5
 @#3Tushar3099 
 
-## Usage
-DevBuddy assist in tab organisation, using **Category** for collecting tabs that are related together and **Group** for collating tabs that are opened for similar purpose. 
 
 #### Functionalities: 
 
-- **Add Categories**
+- **Add Categories/Groups**
 
 This function allow adding of new category and group name for tabs to be capture.
 
 ![Addcategories](./app/src/utils/images/addcat.png)
 
-- **Capture**
+- **Capture Tabs**
 
 This feature capture the current browser window tabs with option to select category and groups based on currently available categories and group.
 
@@ -70,13 +63,14 @@ The tabs group feature when clicked popup a modal for
 
 ![TabModal](./app/src/utils/images/tabmodal.png)
 
-- **Icon delete to category**
+- **Delete to Categories/Groups**
   
 To remove entire category with categories 
 
-- **Icon to add group to existing category**
+- **Add group to existing category**
 
 To add group to an existing category
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
