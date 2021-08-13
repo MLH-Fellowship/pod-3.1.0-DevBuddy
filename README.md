@@ -77,6 +77,16 @@ To remove entire category with categories
 - **Icon to add group to existing category**
 
 To add group to an existing category
+
+- **Search Category**
+
+The feature allow searching through the enitre collection of categories using the name of preferred category. If it exist it returns the category and if not returns nothing.
+
+### Search Demo
+
+https://user-images.githubusercontent.com/45001916/129387329-79ddad28-71d8-47fa-b8a0-142136f07cf3.mp4
+
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
